@@ -14,7 +14,7 @@ declare const XLSX: any;
 
 // Helper Icons
 const HomeIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
-const SettingsIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
+const SettingsIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0 2l.15.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
 const UserIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
 const GoogleIcon: React.FC<{className?: string}> = (props) => <svg {...props} role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.18-1.73 4.1-1.05 1.05-2.36 1.84-4.66 1.84-5.52 0-10-4.48-10-10s4.48-10 10-10c3.04 0 5.25 1.24 6.84 2.73L19.43 4c-1.84-1.73-4.1-2.73-7.43-2.73-6.17 0-11.17 5-11.17 11.17s5 11.17 11.17 11.17c7.04 0 10.74-4.84 10.74-10.92 0-.73-.08-1.44-.2-2.16h-10.32z"/></svg>;
 
@@ -620,8 +620,8 @@ const ImportacionesView = ({ historico, setHistorico, importacionActiva, setImpo
                     <div className="bg-teal-600 text-white p-3 rounded-lg text-center"><h5 className="text-xs font-bold uppercase">Profit Neto (Tras Ads)</h5><p className="font-bold text-2xl mt-1">{PAISES[profitData.pais].simbolo}{fmt(profitData.profitNetoAds)}</p></div>
                     <div className="bg-black text-lime-400 p-3 rounded-lg text-center border-2 border-lime-400"><h5 className="text-xs font-bold uppercase text-white">Profit Final (Total)</h5><p className="font-bold text-2xl mt-1">{PAISES[profitData.pais].simbolo}{fmt(profitData.profitFinal)}</p></div>
                 </div>
-                <div className="bg-gray-800 p-4 rounded-lg mt-4 border border-gray-700">
-                   <h3 className="font-bold text-center text-white mb-4">COSTO - BENEFICIO</h3>
+                <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                   <h3 className="font-bold text-center text-white mb-4 text-lg flex items-center justify-center gap-2"><TrendingUp size={20} /> COSTO VS BENEFICIO</h3>
                    <div className="w-full h-64 flex justify-around items-end gap-2 text-white text-xs text-center">
                         {[
                             {label: 'FACTURACIÓN', value: profitData.facturacion, color: 'bg-green-500'},
@@ -643,6 +643,48 @@ const ImportacionesView = ({ historico, setHistorico, importacionActiva, setImpo
                             )
                         })}
                    </div>
+                </div>
+                 <div className="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                    <h3 className="font-bold text-center text-white mb-4 text-lg">ANÁLISIS DETALLADO</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-gray-900/50 p-4 rounded-lg">
+                            <h4 className="font-bold text-yellow-400 flex items-center gap-2 mb-3"><Package size={18}/> Resumen de Pedidos</h4>
+                            <ul className="space-y-2 text-sm">
+                                <li className="flex justify-between items-center"><span>Total Pedidos:</span> <span className="font-bold text-lg">{fmt(profitData.total)}</span></li>
+                                <li className="flex justify-between items-center"><span>Pedidos Enviados:</span> <span className="font-bold text-lg">{fmt(profitData.enviados)}</span></li>
+                                <li className="flex justify-between items-center text-green-400"><span>Pedidos Entregados:</span> <span className="font-bold text-lg">{fmt(profitData.entregados)}</span></li>
+                            </ul>
+                        </div>
+                        <div className="bg-gray-900/50 p-4 rounded-lg">
+                            <h4 className="font-bold text-yellow-400 flex items-center gap-2 mb-3"><AlertCircle size={18}/> Incidencias y Devoluciones</h4>
+                            <ul className="space-y-2 text-sm">
+                                <li className="flex justify-between items-center"><span>Novedades:</span> <span className="font-bold text-lg">{fmt(profitData.novedades)}</span></li>
+                                <li className="flex justify-between items-center"><span>Rehusados (Tránsito):</span> <span className="font-bold text-lg">{fmt(profitData.rehusadosTransito)}</span></li>
+                                <li className="flex justify-between items-center"><span>Rehusados (Recep.):</span> <span className="font-bold text-lg">{fmt(profitData.rehusadosRecepcionados)}</span></li>
+                                <li className="flex justify-between items-center text-red-400"><span>Cancelados/Rechazados:</span> <span className="font-bold text-lg">{fmt(profitData.cancelados + profitData.rechazados)}</span></li>
+                            </ul>
+                        </div>
+                        <div className="bg-gray-900/50 p-4 rounded-lg">
+                            <h4 className="font-bold text-yellow-400 flex items-center gap-2 mb-3"><DollarSign size={18}/> Desglose Financiero</h4>
+                            <ul className="space-y-2 text-sm">
+                                <li className="flex justify-between items-center"><span>Facturación:</span> <span className="font-bold text-green-400">{PAISES[profitData.pais].simbolo}{fmt(profitData.facturacion)}</span></li>
+                                <li className="flex justify-between items-center"><span>Costo Productos:</span> <span className="font-bold text-red-400">{PAISES[profitData.pais].simbolo}{fmt(profitData.costoProductos)}</span></li>
+                                <li className="flex justify-between items-center"><span>Costo Envíos:</span> <span className="font-bold text-red-400">{PAISES[profitData.pais].simbolo}{fmt(profitData.costoEnvioTotal)}</span></li>
+                                <li className="flex justify-between items-center"><span>Costo Devoluciones:</span> <span className="font-bold text-red-400">{PAISES[profitData.pais].simbolo}{fmt(profitData.costoDevolucionFleteTotal)}</span></li>
+                                <li className="flex justify-between items-center border-t border-gray-700 mt-2 pt-2"><span>Inversión Ads Total:</span> <span className="font-bold text-red-400">{PAISES[profitData.pais].simbolo}{fmt(profitData.inversionPublicidadTotal)}</span></li>
+                                 <li className="flex justify-between items-center"><span>Gastos Operativos:</span> <span className="font-bold text-red-400">{PAISES[profitData.pais].simbolo}{fmt(profitData.gastosOperativosTotal)}</span></li>
+                            </ul>
+                        </div>
+                        <div className="bg-gray-900/50 p-4 rounded-lg">
+                            <h4 className="font-bold text-yellow-400 flex items-center gap-2 mb-3"><TrendingUp size={18}/> Métricas Clave (KPIs)</h4>
+                            <ul className="space-y-2 text-sm">
+                                 <li className="flex justify-between items-center"><span>Tasa de Confirmación:</span> <span className="font-bold text-lg">{profitData.total > 0 ? fmtDec((profitData.enviados / profitData.total) * 100) : '0.00'}%</span></li>
+                                <li className="flex justify-between items-center"><span>Tasa de Entrega:</span> <span className="font-bold text-lg">{profitData.enviados > 0 ? fmtDec((profitData.entregados / profitData.enviados) * 100) : '0.00'}%</span></li>
+                                <li className="flex justify-between items-center"><span>CPA Real:</span> <span className="font-bold text-lg">{PAISES[profitData.pais].simbolo}{fmtDec(profitData.cpaReal)}</span></li>
+                                <li className="flex justify-between items-center"><span>ROI:</span> <span className={`font-bold text-lg ${profitData.roi >= 0 ? 'text-green-400' : 'text-red-400'}`}>{fmtDec(profitData.roi)}%</span></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
