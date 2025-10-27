@@ -22,6 +22,26 @@ const SettingsIcon: React.FC<{className?: string}> = (props) => <svg {...props} 
 const UserIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
 const LogoutIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>;
 
+// --- Componente de Logo ---
+const Logo = ({ className }: { className?: string }) => (
+  <div className={`flex items-center gap-2 ${className}`}>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="logoGradient" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FBBF24"/>
+          <stop offset="1" stopColor="#F59E0B"/>
+        </linearGradient>
+      </defs>
+      <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#logoGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M2 17L12 22L22 17" stroke="url(#logoGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M2 12L12 17L22 12" stroke="url(#logoGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+    <span className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">
+      Coinnecta Pro
+    </span>
+  </div>
+);
+
 // --- Componente de Tarjeta Genérica ---
 const Card: React.FC<React.PropsWithChildren<{className?: string}>> = ({ children, className }) => (
     <div className={`bg-black/20 backdrop-blur-sm border border-white/10 rounded-2xl p-6 ${className}`}>
@@ -250,7 +270,6 @@ export default function App() {
     switch (currentPage) {
       case 'dashboard': return <DashboardView profitData={profitData} historico={historico} calcProfit={calcProfit} setCurrentPage={setCurrentPage} />;
       case 'productos': return <ProductosView pais={pais} productos={productos} setProductos={setProductos} form={form} setForm={setForm} editId={editId} setEditId={setEditId} incluirIva={incluirIva} setIncluirIva={setIncluirIva} tasas={tasas} setTasas={setTasas} cpaMedio={cpaMedio} setCpaMedio={setCpaMedio} calcularProducto={calcularProducto} setFeedbackMsg={setFeedbackMsg} setCurrentPage={setCurrentPage} />;
-      // FIX: Added missing props to the ImportacionesView component call to match its definition and fix the TypeScript error.
       case 'importaciones': return <ImportacionesView historico={historico} setHistorico={setHistorico} importacionActiva={importacionActiva} setImportacionActiva={setImportacionActiva} handleFileUpload={handleFileUpload} cargando={cargando} feedbackMsg={feedbackMsg} setFeedbackMsg={setFeedbackMsg} calcProfit={calcProfit} />;
       case 'historial': return <HistorialView historico={historico} onUpdateItem={handleUpdateHistoricoItem} calcProfit={calcProfit} />;
       case 'configuracion': return <ConfiguracionView profile={profile} setProfile={setProfile} tasasDeCambio={tasasDeCambio} setTasasDeCambio={setTasasDeCambio} setFeedbackMsg={setFeedbackMsg} onLogout={() => { setIsLoggedIn(false); localStorage.removeItem('usuario'); }} />;
@@ -262,8 +281,8 @@ export default function App() {
     <div className="min-h-screen bg-black text-white/90 font-sans flex" style={{background: 'radial-gradient(circle, rgba(17,24,39,1) 0%, rgba(13,13,13,1) 100%)'}}>
       <aside className="w-64 bg-black/30 backdrop-blur-lg border-r border-white/10 flex-col sticky top-0 h-screen hidden md:flex">
         <div className="px-6 py-5 border-b border-white/10">
-          <h1 className="text-2xl font-black bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">Coinnecta Pro</h1>
-          <p className="text-xs text-gray-400 -mt-1">Dropshipping Profesional</p>
+          <Logo />
+          <p className="text-xs text-gray-400 mt-1 ml-9">Dropshipping Profesional</p>
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           {navItems.map(item => (
@@ -289,7 +308,7 @@ export default function App() {
       <div className="flex-1 overflow-y-auto">
         <header className="sticky top-0 z-40 bg-black/30 backdrop-blur-lg border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between md:justify-end items-center">
-            <h1 className="md:hidden text-xl font-black bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">Coinnecta Pro</h1>
+            <div className="md:hidden"><Logo /></div>
             <div className="relative">
               <button onClick={() => setShowPaisMenu(!showPaisMenu)} className="flex items-center gap-2 px-4 py-2 bg-black/20 border border-white/10 rounded-lg cursor-pointer text-white text-sm font-bold hover:bg-white/10 transition-colors">
                 <span className="text-2xl">{pais.flag}</span>
@@ -315,7 +334,7 @@ export default function App() {
               {feedbackMsg.text}
             </div>
           )}
-          {currentPage === 'importaciones' ? <ImportacionesView historico={historico} setHistorico={setHistorico} importacionActiva={importacionActiva} setImportacionActiva={setImportacionActiva} handleFileUpload={handleFileUpload} cargando={cargando} feedbackMsg={feedbackMsg} setFeedbackMsg={setFeedbackMsg} calcProfit={calcProfit} /> : renderContent()}
+          {renderContent()}
         </main>
       </div>
     </div>
@@ -326,7 +345,7 @@ const LoginView = ({ onLogin }: { onLogin: (userData: any) => void }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const googleButtonRef = useRef<HTMLDivElement>(null);
-  const brandImage = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAXIBHEDASIAAhEBAxEB/8QAGwABAQACAwEAAAAAAAAAAAAAAAEFBgIDBAf/xABIEAABAwIFAgMHAwEFBwQBBAMAAQIDBBEFBhIhMQdBE1FhcYEikaEIEyMyQlKxwdEUM2Jy4fAVQ4KS8SVTsiY0Y3PCg5RV/8QAFwEBAQEBAAAAAAAAAAAAAAAAAAECA//EACIRAQEAAgMBAAEFAAAAAAAAAAABEQISITFBUQMTYXEiMv/aAAwDAQACEQMRAD8A9UoQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQ-D-/9j/";
+  const brandImage = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAXIBHEDASIAAhEBAxEB/8QAGwABAQACAwEAAAAAAAAAAAAAAAEFBgIDBAf/xABIEAABAwIFAgMHAwEFBwQBBAMAAQIDBBEFBhIhMQdBE1FhcYEikaEIEyMyQlKxwdEUM2Jy4fAVQ4KS8SVTsiY0Y3PCg5RV/8QAFwEBAQEBAAAAAAAAAAAAAAAAAAECA//EACIRAQEAAgMBAAEFAAAAAAAAAAABEQISITFBUQMTYXEiMv/aAAwDAQACEQMRAD8A9UoQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQ-D-/";
 
   useEffect(() => {
     if (window.google && googleButtonRef.current) {
@@ -354,13 +373,8 @@ const LoginView = ({ onLogin }: { onLogin: (userData: any) => void }) => {
         style={{ backgroundImage: `url(${brandImage})` }}
       >
         <div className="absolute inset-0 bg-black/60 flex flex-col justify-end p-12">
-          <h1 className="text-5xl lg:text-6xl font-black text-white leading-tight">
-            Bienvenido a <br/>
-            <span className="bg-gradient-to-r from-yellow-400 to-amber-400 bg-clip-text text-transparent">
-              Coinnecta Pro
-            </span>
-          </h1>
-          <p className="text-xl text-gray-300 mt-4 max-w-md">
+           <Logo className="mb-4" />
+          <p className="text-xl text-gray-300 mt-2 max-w-md">
             Tu centro de control para Dropshipping Profesional.
           </p>
         </div>
@@ -419,6 +433,19 @@ const LoginView = ({ onLogin }: { onLogin: (userData: any) => void }) => {
   );
 };
 
+// --- Componente de Tarjeta de Estadísticas ---
+const StatCard = ({ icon: Icon, title, value, colorClass = 'text-yellow-400' }) => (
+    <Card className="flex items-center gap-4">
+        <div className={`p-3 rounded-lg bg-gradient-to-br from-gray-700/50 to-gray-800/50 border border-white/10 ${colorClass}`}>
+            <Icon size={24} />
+        </div>
+        <div>
+            <p className="text-sm font-bold text-gray-400">{title}</p>
+            <p className={`text-2xl font-bold mt-1 ${colorClass}`}>{value}</p>
+        </div>
+    </Card>
+);
+
 const DashboardView = ({ profitData, historico, calcProfit, setCurrentPage }) => {
     if (!profitData) {
         return (
@@ -435,14 +462,16 @@ const DashboardView = ({ profitData, historico, calcProfit, setCurrentPage }) =>
       <div className="space-y-6">
           <h2 className="text-3xl font-bold text-white">Dashboard</h2>
           <p className="text-gray-400 -mt-4">Resumen de tu última importación.</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-gradient-to-br from-yellow-400 to-amber-500 p-6 rounded-2xl text-black">
-                  <p className="text-sm font-bold opacity-80">Profit Final</p>
-                  <p className="text-4xl font-extrabold mt-2">{PAISES[profitData.pais].simbolo}{fmt(profitData.profitFinal)}</p>
-              </div>
-              <Card><p className="text-sm font-bold text-gray-400">Facturación</p><p className="text-4xl font-bold mt-2 text-yellow-400">{PAISES[profitData.pais].simbolo}{fmt(profitData.facturacion)}</p></Card>
-              <Card><p className="text-sm font-bold text-gray-400">Pedidos Totales</p><p className="text-4xl font-bold mt-2">{fmt(profitData.total)}</p></Card>
-              <Card><p className="text-sm font-bold text-gray-400">Tasa de Entrega</p><p className="text-4xl font-bold mt-2 text-blue-400">{fmtDec(tasaEntrega)}%</p></Card>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="md:col-span-2 bg-gradient-to-br from-yellow-900/40 to-black/30 border-yellow-500/30">
+                  <p className="text-lg font-bold text-yellow-300">Profit Final</p>
+                  <p className="text-5xl font-extrabold mt-2 text-white">{PAISES[profitData.pais].simbolo}{fmt(profitData.profitFinal)}</p>
+                  <p className="text-sm text-gray-400 mt-2">Beneficio neto después de todos los costos.</p>
+              </Card>
+              <StatCard icon={DollarSign} title="Facturación" value={`${PAISES[profitData.pais].simbolo}${fmt(profitData.facturacion)}`} colorClass="text-green-400" />
+              <StatCard icon={ShoppingCart} title="Pedidos Totales" value={fmt(profitData.total)} colorClass="text-blue-400" />
+              <StatCard icon={Truck} title="Tasa de Entrega" value={`${fmtDec(tasaEntrega)}%`} colorClass="text-teal-400" />
+              <StatCard icon={TrendingDown} title="Costos Totales" value={`${PAISES[profitData.pais].simbolo}${fmt(profitData.costos)}`} colorClass="text-red-400" />
           </div>
           <Card>
               <h3 className="text-xl font-bold text-white mb-4">Historial de Profit</h3>
