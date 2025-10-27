@@ -1,10 +1,8 @@
-
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   Calculator, Upload, DollarSign, ChevronDown, Plus, Edit, Trash2,
   AlertCircle, Package, TrendingUp, TrendingDown, Eye, Building2,
-  Truck, CreditCard, ShoppingCart, Wallet, BookOpen
+  Truck, CreditCard, ShoppingCart, Wallet, BookOpen, Mail, Lock
 } from './components/icons';
 import { PAISES, DEFAULT_TASAS_DE_CAMBIO } from './constants';
 import type { FormState, Producto, HistoricoItem, InversionData, CpaMedio, GastosOperativos, ProductoCalculado, ProfitData, TarjetaDropi, UserProfile, TasasDeCambio } from './types';
@@ -12,11 +10,17 @@ import { fmt, fmtDec, convertir } from './utils/formatters';
 
 declare const XLSX: any;
 
+// Declaración para que TypeScript reconozca el objeto 'google' de la librería GSI
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
 // Helper Icons
 const HomeIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
 const SettingsIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0 2l.15.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>;
 const UserIcon: React.FC<{className?: string}> = (props) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
-const GoogleIcon: React.FC<{className?: string}> = (props) => <svg {...props} role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12.48 10.92v3.28h7.84c-.24 1.84-.85 3.18-1.73 4.1-1.05 1.05-2.36 1.84-4.66 1.84-5.52 0-10-4.48-10-10s4.48-10 10-10c3.04 0 5.25 1.24 6.84 2.73L19.43 4c-1.84-1.73-4.1-2.73-7.43-2.73-6.17 0-11.17 5-11.17 11.17s5 11.17 11.17 11.17c7.04 0 10.74-4.84 10.74-10.92 0-.73-.08-1.44-.2-2.16h-10.32z"/></svg>;
 
 
 export default function App() {
@@ -44,13 +48,46 @@ export default function App() {
   const [feedbackMsg, setFeedbackMsg] = useState<{type: 'success' | 'error', text: string} | null>(null);
   const [expandedMonths, setExpandedMonths] = useState<{ [key: string]: boolean }>({});
 
+  const handleLoginSuccess = useCallback((userData: any) => {
+    setIsLoggedIn(true);
+    setProfile(prev => ({ ...prev, nombre: userData.name || 'Usuario', empresa: prev.empresa || 'Mi Empresa' }));
+    localStorage.setItem('usuario', JSON.stringify(userData));
+    setFeedbackMsg({ type: 'success', text: `¡Bienvenido, ${userData.name}!` });
+    setTimeout(() => setFeedbackMsg(null), 3000);
+  }, []);
+
+  useEffect(() => {
+    // Expose login handler for Google's callback
+    window.handleGoogleLogin = handleLoginSuccess;
+    
+    // Check for existing session
+    try {
+      const storedUser = localStorage.getItem('usuario');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        setProfile(prev => ({ ...prev, nombre: userData.name || 'Usuario' }));
+        setIsLoggedIn(true);
+      }
+    } catch (error) {
+      console.error("Failed to process stored user session:", error);
+      localStorage.removeItem('usuario');
+    }
+
+    return () => {
+      delete window.handleGoogleLogin;
+    };
+  }, [handleLoginSuccess]);
+
+
   useEffect(() => {
     try {
       const saved = localStorage.getItem('coinnecta_data_v6');
       if (saved) {
         const data = JSON.parse(saved);
         setProductos(data.productos || []);
-        setProfile(data.profile || { nombre: 'Usuario', empresa: 'Mi Empresa' });
+        if (data.profile) {
+            setProfile(prev => ({...prev, ...data.profile}));
+        }
         setTasasDeCambio(data.tasasDeCambio || DEFAULT_TASAS_DE_CAMBIO);
         
         const loadedHistorico = data.historico || [];
@@ -260,7 +297,7 @@ export default function App() {
   const profitData = importacionActiva ? calcProfit(importacionActiva) : null;
 
   if (!isLoggedIn) {
-    return <LoginView onLogin={() => setIsLoggedIn(true)} />;
+    return <LoginView onLogin={handleLoginSuccess} />;
   }
 
   const renderContent = () => {
@@ -337,27 +374,121 @@ export default function App() {
   );
 }
 
-const LoginView = ({ onLogin }) => (
-  <div className="min-h-screen w-full flex items-center justify-center bg-gray-900">
-    <div className="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-2xl border border-yellow-500/30">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-200 bg-clip-text text-transparent">Coinnecta Pro</h1>
-        <p className="mt-2 text-gray-400">Tu centro de control para Dropshipping.</p>
-      </div>
-      <div className="text-center text-sm text-gray-500">
-          <p>Esta es una simulación de inicio de sesión.</p>
-          <p>En una aplicación real, esto te conectaría de forma segura a tu cuenta.</p>
-      </div>
-      <button
-        onClick={onLogin}
-        className="w-full flex items-center justify-center gap-3 py-3 px-4 font-bold text-gray-800 bg-white rounded-lg hover:bg-gray-200 transition-colors"
+const LoginView = ({ onLogin }: { onLogin: (userData: any) => void }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const googleButtonRef = useRef<HTMLDivElement>(null);
+  const brandImage = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAXIBHEDASIAAhEBAxEB/8QAGwABAQACAwEAAAAAAAAAAAAAAAEFBgIDBAf/xABIEAABAwIFAgMHAwEFBwQBBAMAAQIDBBEFBhIhMQdBE1FhcYEikaEIEyMyQlKxwdEUM2Jy4fAVQ4KS8SVTsiY0Y3PCg5RV/8QAFwEBAQEBAAAAAAAAAAAAAAAAAAECA//EACIRAQEAAgMBAAEFAAAAAAAAAAABEQISITFBUQMTYXEiMv/aAAwDAQACEQMRAD8A9UoQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQhAIQ-iQ==/9j/";
+
+  useEffect(() => {
+    if (window.google && googleButtonRef.current) {
+      if (googleButtonRef.current.childElementCount === 0) { // Evita re-renderizar el botón
+        window.google.accounts.id.renderButton(
+          googleButtonRef.current,
+          { 
+            theme: "outline", 
+            size: "large",
+            type: "standard",
+            shape: "rectangular",
+            text: "signin_with",
+            logo_alignment: "left"
+          }
+        );
+      }
+    }
+  }, []);
+
+  const handleEmailLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (email && password) {
+      onLogin({
+        name: email.split('@')[0],
+        email: email,
+      });
+    }
+  };
+  
+  return (
+    <div className="min-h-screen md:flex bg-gray-900">
+      <div 
+        className="hidden md:block md:w-1/2 lg:w-3/5 relative bg-cover bg-center"
+        style={{ backgroundImage: `url(${brandImage})` }}
       >
-        <GoogleIcon className="w-6 h-6" />
-        <span>Iniciar sesión con Google</span>
-      </button>
+        <div className="absolute inset-0 bg-black/50 flex flex-col justify-end p-12">
+          <h1 className="text-5xl lg:text-6xl font-black text-white leading-tight">
+            Bienvenido a <br/>
+            <span className="bg-gradient-to-r from-yellow-400 to-amber-300 bg-clip-text text-transparent">
+              Coinnecta Pro
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 mt-4 max-w-md">
+            Tu centro de control para Dropshipping Profesional.
+          </p>
+        </div>
+      </div>
+      
+      <div className="w-full md:w-1/2 lg:w-2/5 flex items-center justify-center p-8 md:p-12">
+        <div className="w-full max-w-md">
+            <div className="text-left mb-10">
+              <h2 className="text-4xl font-bold text-white">Iniciar Sesión</h2>
+              <p className="text-gray-400 mt-2">Accede a tu dashboard para continuar.</p>
+            </div>
+          
+            <form onSubmit={handleEmailLogin} className="space-y-5">
+              <div>
+                <label className="text-sm font-bold text-gray-400 block mb-2" htmlFor="email">Email</label>
+                <div className="relative">
+                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" size={20}/>
+                   <input 
+                     id="email"
+                     type="email" 
+                     value={email}
+                     onChange={(e) => setEmail(e.target.value)}
+                     className="w-full bg-gray-800 text-white p-3.5 pl-11 rounded-lg border border-gray-700 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
+                     placeholder="tu@email.com"
+                     required
+                   />
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-bold text-gray-400 block mb-2" htmlFor="password">Contraseña</label>
+                <div className="relative">
+                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500" size={20}/>
+                   <input 
+                     id="password"
+                     type="password"
+                     value={password}
+                     onChange={(e) => setPassword(e.target.value)} 
+                     className="w-full bg-gray-800 text-white p-3.5 pl-11 rounded-lg border border-gray-700 focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 outline-none transition-all"
+                     placeholder="••••••••"
+                     required
+                   />
+                </div>
+                <a href="#" className="text-xs text-yellow-400 hover:underline mt-2 block text-right">¿Olvidaste tu contraseña?</a>
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3.5 px-4 font-bold text-gray-900 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all shadow-lg hover:shadow-yellow-500/30 focus:outline-none focus:ring-4 focus:ring-yellow-500/50 transform hover:scale-[1.02]"
+              >
+                Iniciar Sesión
+              </button>
+            </form>
+
+            <div className="my-8 flex items-center justify-between">
+              <span className="w-full border-b border-gray-700"></span>
+              <span className="text-xs text-center text-gray-500 uppercase px-4">O</span>
+              <span className="w-full border-b border-gray-700"></span>
+            </div>
+            
+            <div className="flex justify-center">
+               <div ref={googleButtonRef} id="g_id_signin"></div>
+            </div>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
+
 
 const DashboardView = ({ profitData, historico, calcProfit, setCurrentPage }) => {
     const profitHistory = historico

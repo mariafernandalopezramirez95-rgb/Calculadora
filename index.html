@@ -33,6 +33,26 @@
   <body>
     <div id="root"></div>
 
+    <script>
+      // Este callback debe estar disponible globalmente *antes* de que el script de GSI se cargue y ejecute.
+      // Definirlo aquí asegura que esté listo a tiempo.
+      function onGoogleSignIn(response) {
+        // Decodifica la credencial para obtener los datos del usuario.
+        const data = JSON.parse(atob(response.credential.split('.')[1]));
+        
+        // La app de React define 'handleGoogleLogin' en el objeto window cuando está lista.
+        if (window.handleGoogleLogin) {
+          window.handleGoogleLogin(data);
+        } else {
+          // Si React aún no se ha cargado, usamos un fallback: guardar los datos del usuario y recargar.
+          // La app recogerá el usuario guardado en la siguiente carga.
+          console.error("El manejador de login de Google en React no está inicializado. Usando fallback.");
+          localStorage.setItem('usuario', JSON.stringify(data));
+          window.location.reload();
+        }
+      }
+    </script>
+
     <!-- BLOQUE GOOGLE SIGN-IN -->
     <div
       id="g_id_onload"
@@ -41,7 +61,7 @@
       data-auto_prompt="false">
     </div>
 
-    <div class="g_id_signin" data-type="standard"></div>
+    <!-- El botón de Google se renderizará a través de React -->
     <!-- FIN BLOQUE -->
 
     <script type="module" src="/index.tsx"></script>

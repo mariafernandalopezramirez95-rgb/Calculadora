@@ -2,15 +2,19 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 
-// Google Sign-In callback
-function onGoogleSignIn(response) {
-  const data = JSON.parse(atob(response.credential.split('.')[1]));
-  console.log('Usuario:', data);
-  localStorage.setItem('usuario', JSON.stringify(data));
-  alert(`Bienvenido, ${data.name}!`);
+// Type definition for custom properties on the window object
+declare global {
+  interface Window {
+    // onGoogleSignIn está ahora definido en index.html, pero lo declaramos para TypeScript
+    onGoogleSignIn: (response: any) => void;
+    handleGoogleLogin: (userData: any) => void;
+  }
 }
-// Expose function globally for Google Sign-In
-window.onGoogleSignIn = onGoogleSignIn;
+
+// La función onGoogleSignIn ha sido movida a una etiqueta <script> en index.html
+// para prevenir una condición de carrera con la librería de Google GSI.
+// La app de React ahora solo será responsable de definir 'handleGoogleLogin'
+// para que el callback global lo use.
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {
