@@ -7,12 +7,6 @@ export interface Pais {
   iva: number;
 }
 
-export interface Agencia {
-  nombre: string;
-  comision: number;
-  moneda: string;
-}
-
 export interface ProductoCalculado {
   coste: number;
   costeConIva: number;
@@ -51,7 +45,7 @@ export interface FormState {
 export interface InversionData {
   monto: string;
   moneda: string;
-  agencia: string;
+  tieneAgencia: boolean;
 }
 
 export interface CpaMedio {
@@ -101,17 +95,19 @@ export interface HistoricoItem {
   archivo: string;
   pais: string;
   datos: ImportacionDatos;
+  nombreEditable?: string;
+  anotaciones?: string;
 }
 
 export interface ProfitData extends ImportacionDatos {
     facturacion: number;
     costos: number;
     profitOperativo: number;
+    profitNetoAds: number;
     profitFinal: number;
     inversionPublicidadTotal: number;
     gastosOperativosTotal: number;
     pais: string;
-    agencia?: string;
     comisionPorcentaje?: number;
     inversionMoneda?: string;
     comisionAgenciaPublicidad?: number;
@@ -122,7 +118,13 @@ export interface ProfitData extends ImportacionDatos {
     cpaCampana?: number;
     cpaReal?: number;
     roi?: number;
-    beneficioGastos: number;
-    beneficioPosibleDev: number;
-    comisionAgenciaFacturacion?: number;
+}
+
+export interface UserProfile {
+  nombre: string;
+  empresa: string;
+}
+
+export interface TasasDeCambio {
+  [key: string]: number;
 }
