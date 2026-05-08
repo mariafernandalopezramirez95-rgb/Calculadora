@@ -118,6 +118,7 @@ export interface ProfitData extends ImportacionDatos {
     cpaCampana?: number;
     cpaReal?: number;
     roi?: number;
+    roas?: number;
 }
 
 export interface UserProfile {

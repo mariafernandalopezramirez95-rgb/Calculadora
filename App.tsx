@@ -165,7 +165,7 @@ export default function App() {
     const costoEnvioEsperado = envio * tasaConf;
     const beneficioEspCOD = ingresoEsperado - costoProductoEsperado - costoEnvioEsperado;
     let comisionRate = 0;
-    if (paisSel === 'colombia' || paisSel === 'mexico') { comisionRate = 0.10; } 
+    if (paisSel === 'colombia' || paisSel === 'mexico' || paisSel === 'argentina') { comisionRate = 0.10; }
     else if (paisSel === 'espana') { comisionRate = 0.05; }
     const comisionTesteo = cpa11 * comisionRate; const comisionEscala = cpa8 * comisionRate;
     const comisionObjetivo = cpaObj > 0 ? cpaObj * comisionRate : 0;
@@ -205,8 +205,9 @@ export default function App() {
     const profitFinal = profitNetoAds - gastosOperativosTotal;
     const gastosAdsOperativos = inversionPublicidadTotalEnMonedaLocal + gastosOperativosTotal;
     const roi = gastosAdsOperativos > 0 ? (profitFinal / gastosAdsOperativos) * 100 : 0;
-    const cpaReal = datos.total > 0 ? inversionPublicidadTotalEnMonedaLocal / datos.total : 0;
-    return { ...datos, facturacion, costos, profitOperativo, profitNetoAds, profitFinal, inversionPublicidadTotal: inversionPublicidadTotalEnMonedaLocal, gastosOperativosTotal, pais: importacion.pais, cpaReal, roi, comisionPorcentaje: comisionPorcentaje, inversionMoneda: monedaInversion, inversionEnCampana: inversionCampanaEnMonedaLocal, comisionAgenciaPublicidad: comisionAgenciaEnMonedaLocal };
+    const roas = inversionPublicidadTotalEnMonedaLocal > 0 ? facturacion / inversionPublicidadTotalEnMonedaLocal : 0;
+    const cpaReal = datos.entregados > 0 ? inversionPublicidadTotalEnMonedaLocal / datos.entregados : 0;
+    return { ...datos, facturacion, costos, profitOperativo, profitNetoAds, profitFinal, inversionPublicidadTotal: inversionPublicidadTotalEnMonedaLocal, gastosOperativosTotal, pais: importacion.pais, cpaReal, roi, roas, comisionPorcentaje: comisionPorcentaje, inversionMoneda: monedaInversion, inversionEnCampana: inversionCampanaEnMonedaLocal, comisionAgenciaPublicidad: comisionAgenciaEnMonedaLocal };
   }, [historico, inversionData, gastosOperativos, tasasDeCambio]);
   
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -472,6 +473,8 @@ const DashboardView = ({ profitData, historico, calcProfit, setCurrentPage }) =>
               <StatCard icon={ShoppingCart} title="Pedidos Totales" value={fmt(profitData.total)} colorClass="text-blue-400" />
               <StatCard icon={Truck} title="Tasa de Entrega" value={`${fmtDec(tasaEntrega)}%`} colorClass="text-teal-400" />
               <StatCard icon={TrendingDown} title="Costos Totales" value={`${PAISES[profitData.pais].simbolo}${fmt(profitData.costos)}`} colorClass="text-red-400" />
+              <StatCard icon={TrendingUp} title="ROAS" value={profitData.roas ? `${fmtDec(profitData.roas)}x` : '—'} colorClass="text-purple-400" />
+              <StatCard icon={DollarSign} title="CPA Real" value={`${PAISES[profitData.pais].simbolo}${fmt(profitData.cpaReal ?? 0)}`} colorClass="text-orange-400" />
           </div>
           <Card>
               <h3 className="text-xl font-bold text-white mb-4">Historial de Profit</h3>
@@ -533,7 +536,7 @@ const ProductosView = ({ pais, productos, setProductos, form, setForm, editId, s
                  </Card>
                  {metricas && (
                    <Card>
-                     <h3 className="text-lg font-bold mb-4 text-yellow-400">💰 PROFIT POR PEDIDO ENTREGADO</h3>
+                     <h3 className="text-lg font-bold mb-4 text-yellow-400">💰 PROFIT POR PEDIDO</h3>
                       <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
                               <div className="bg-blue-500/10 p-4 rounded-lg text-center border border-blue-500/20"><p className="text-xs text-gray-400">🧪 Testeo (CPA 11%)</p><p className={`my-1 text-2xl font-bold ${metricas.profitTesteo >= 0 ? 'text-green-400' : 'text-red-400'}`}>{pais.simbolo}{fmt(metricas.profitTesteo)}</p></div>
@@ -628,7 +631,7 @@ const HistorialView = ({ historico, onUpdateItem, calcProfit }) => {
                             <Card key={key}>
                                 <div className="flex justify-between items-center mb-4">
                                     <h3 className="text-xl font-bold text-yellow-400 capitalize">{group.display}</h3>
-                                    <div className="text-right"><p className="text-sm text-gray-400">Profit del Periodo</p><p className={`font-bold text-lg ${group.totalProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>{fmt(group.totalProfit)} USD</p></div>
+                                    <div className="text-right"><p className="text-sm text-gray-400">Profit del Periodo</p><p className={`font-bold text-lg ${group.totalProfit >= 0 ? 'text-green-400' : 'text-red-400'}`}>{fmt(group.totalProfit)} {group.items[0] ? PAISES[group.items[0].pais]?.moneda : ''}</p></div>
                                 </div>
                                 <div className="space-y-4">{group.items.map(item => <HistoricoItemCard key={item.id} item={item} onUpdate={onUpdateItem} />)}</div>
                             </Card>
