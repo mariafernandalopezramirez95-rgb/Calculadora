@@ -24,6 +24,9 @@ export interface ProductoCalculado {
   profitTesteo: number;
   profitEscala: number;
   profitObjetivo: number | null;
+  roasTesteo: number;
+  roasEscala: number;
+  roasObjetivo: number | null;
 }
 
 export interface Producto extends ProductoCalculado {

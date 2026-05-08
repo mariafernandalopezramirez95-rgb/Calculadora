@@ -167,7 +167,10 @@ export default function App() {
     const profitTesteo = beneficioEspCOD - cpa11;
     const profitEscala = beneficioEspCOD - cpa8;
     const profitObjetivo = cpaObj > 0 ? beneficioEspCOD - cpaObj : null;
-    return { coste, costeConIva, envio, beneficioBruto, margenBruto, cpa8, cpa11, cpaObj, tasaFinal, ingresoEsperado, costoProductoEsperado, costoEnvioEsperado, beneficioEspCOD, profitTesteo, profitEscala, profitObjetivo };
+    const roasTesteo = cpa11 > 0 ? ingresoEsperado / cpa11 : 0;
+    const roasEscala = cpa8 > 0 ? ingresoEsperado / cpa8 : 0;
+    const roasObjetivo = cpaObj > 0 ? ingresoEsperado / cpaObj : null;
+    return { coste, costeConIva, envio, beneficioBruto, margenBruto, cpa8, cpa11, cpaObj, tasaFinal, ingresoEsperado, costoProductoEsperado, costoEnvioEsperado, beneficioEspCOD, profitTesteo, profitEscala, profitObjetivo, roasTesteo, roasEscala, roasObjetivo };
   }, [form, paisSel, incluirIva, tasas]);
 
   const calcProfit = useCallback((importacionId: number): ProfitData | null => {
@@ -525,8 +528,16 @@ const ProductosView = ({ pais, productos, setProductos, form, setForm, editId, s
                      <h3 className="text-lg font-bold mb-4 text-yellow-400">💰 PROFIT POR PEDIDO</h3>
                       <div className="space-y-4">
                             <div className="grid grid-cols-2 gap-4">
-                              <div className="bg-blue-500/10 p-4 rounded-lg text-center border border-blue-500/20"><p className="text-xs text-gray-400">🧪 Testeo (CPA 11%)</p><p className={`my-1 text-2xl font-bold ${metricas.profitTesteo >= 0 ? 'text-green-400' : 'text-red-400'}`}>{pais.simbolo}{fmt(metricas.profitTesteo)}</p></div>
-                              <div className="bg-green-500/10 p-4 rounded-lg text-center border border-green-500/20"><p className="text-xs text-gray-400">📈 Escala (CPA 8%)</p><p className={`my-1 text-2xl font-bold ${metricas.profitEscala >= 0 ? 'text-green-400' : 'text-red-400'}`}>{pais.simbolo}{fmt(metricas.profitEscala)}</p></div>
+                              <div className="bg-blue-500/10 p-4 rounded-lg text-center border border-blue-500/20">
+                                <p className="text-xs text-gray-400">🧪 Testeo (CPA 11%)</p>
+                                <p className={`my-1 text-2xl font-bold ${metricas.profitTesteo >= 0 ? 'text-green-400' : 'text-red-400'}`}>{pais.simbolo}{fmt(metricas.profitTesteo)}</p>
+                                <p className="text-xs text-blue-300">ROAS {fmtDec(metricas.roasTesteo)}x</p>
+                              </div>
+                              <div className="bg-green-500/10 p-4 rounded-lg text-center border border-green-500/20">
+                                <p className="text-xs text-gray-400">📈 Escala (CPA 8%)</p>
+                                <p className={`my-1 text-2xl font-bold ${metricas.profitEscala >= 0 ? 'text-green-400' : 'text-red-400'}`}>{pais.simbolo}{fmt(metricas.profitEscala)}</p>
+                                <p className="text-xs text-green-300">ROAS {fmtDec(metricas.roasEscala)}x</p>
+                              </div>
                             </div>
                           </div>
                    </Card>
