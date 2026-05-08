@@ -164,14 +164,9 @@ export default function App() {
     const ingresoEsperado = pvp * tasaFinal; const costoProductoEsperado = costeConIva * tasaFinal;
     const costoEnvioEsperado = envio * tasaConf;
     const beneficioEspCOD = ingresoEsperado - costoProductoEsperado - costoEnvioEsperado;
-    let comisionRate = 0;
-    if (paisSel === 'colombia' || paisSel === 'mexico') { comisionRate = 0.10; }
-    else if (paisSel === 'espana') { comisionRate = 0.05; }
-    const comisionTesteo = cpa11 * comisionRate; const comisionEscala = cpa8 * comisionRate;
-    const comisionObjetivo = cpaObj > 0 ? cpaObj * comisionRate : 0;
-    const profitTesteo = beneficioEspCOD - cpa11 - comisionTesteo;
-    const profitEscala = beneficioEspCOD - cpa8 - comisionEscala;
-    const profitObjetivo = cpaObj > 0 ? beneficioEspCOD - cpaObj - comisionObjetivo : null;
+    const profitTesteo = beneficioEspCOD - cpa11;
+    const profitEscala = beneficioEspCOD - cpa8;
+    const profitObjetivo = cpaObj > 0 ? beneficioEspCOD - cpaObj : null;
     return { coste, costeConIva, envio, beneficioBruto, margenBruto, cpa8, cpa11, cpaObj, tasaFinal, ingresoEsperado, costoProductoEsperado, costoEnvioEsperado, beneficioEspCOD, profitTesteo, profitEscala, profitObjetivo };
   }, [form, paisSel, incluirIva, tasas]);
 
