@@ -174,18 +174,9 @@ export default function App() {
     const importacion = historico.find(h => h.id === importacionId);
     if (!importacion) return null;
     const datos = importacion.datos; const paisData = PAISES[importacion.pais];
-    const monedaPais = paisData.moneda; const { monto, moneda: monedaInversion, tieneAgencia } = inversionData;
-    let comisionPorcentaje = 0;
-    if (tieneAgencia) {
-        if (importacion.pais === 'colombia' || importacion.pais === 'mexico') { comisionPorcentaje = 10; } 
-        else if (importacion.pais === 'espana') { comisionPorcentaje = 5; }
-    }
+    const monedaPais = paisData.moneda; const { monto, moneda: monedaInversion } = inversionData;
     const inversionEnCampana = parseFloat(monto) || 0;
-    const comisionAgenciaPublicidad = inversionEnCampana * (comisionPorcentaje / 100);
-    const inversionPublicidadTotal = inversionEnCampana + comisionAgenciaPublicidad;
-    const inversionPublicidadTotalEnMonedaLocal = convertir(inversionPublicidadTotal, monedaInversion, monedaPais, tasasDeCambio);
-    const inversionCampanaEnMonedaLocal = convertir(inversionEnCampana, monedaInversion, monedaPais, tasasDeCambio);
-    const comisionAgenciaEnMonedaLocal = convertir(comisionAgenciaPublicidad, monedaInversion, monedaPais, tasasDeCambio);
+    const inversionPublicidadTotalEnMonedaLocal = convertir(inversionEnCampana, monedaInversion, monedaPais, tasasDeCambio);
     const shopify = parseFloat(gastosOperativos.shopify) || 0;
     const otrosGastos = parseFloat(gastosOperativos.otros) || 0;
     let gastosTarjetasTotal = 0;
@@ -202,7 +193,7 @@ export default function App() {
     const roi = gastosAdsOperativos > 0 ? (profitFinal / gastosAdsOperativos) * 100 : 0;
     const roas = inversionPublicidadTotalEnMonedaLocal > 0 ? facturacion / inversionPublicidadTotalEnMonedaLocal : 0;
     const cpaReal = datos.entregados > 0 ? inversionPublicidadTotalEnMonedaLocal / datos.entregados : 0;
-    return { ...datos, facturacion, costos, profitOperativo, profitNetoAds, profitFinal, inversionPublicidadTotal: inversionPublicidadTotalEnMonedaLocal, gastosOperativosTotal, pais: importacion.pais, cpaReal, roi, roas, comisionPorcentaje: comisionPorcentaje, inversionMoneda: monedaInversion, inversionEnCampana: inversionCampanaEnMonedaLocal, comisionAgenciaPublicidad: comisionAgenciaEnMonedaLocal };
+    return { ...datos, facturacion, costos, profitOperativo, profitNetoAds, profitFinal, inversionPublicidadTotal: inversionPublicidadTotalEnMonedaLocal, gastosOperativosTotal, pais: importacion.pais, cpaReal, roi, roas, inversionMoneda: monedaInversion };
   }, [historico, inversionData, gastosOperativos, tasasDeCambio]);
   
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
