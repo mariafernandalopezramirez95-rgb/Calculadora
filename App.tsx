@@ -157,7 +157,7 @@ export default function App() {
     const envio = parseFloat(form.envio) || 0; const cpaObj = parseFloat(form.cpaObj) || 0;
     if (pvp === 0) return null;
     const pais = PAISES[paisSel];
-    const ivaFactor = (incluirIva && paisSel !== 'colombia') ? (1 + (pais.iva / 100)) : 1;
+    const ivaFactor = (incluirIva && paisSel !== 'colombia' && paisSel !== 'argentina') ? (1 + (pais.iva / 100)) : 1;
     const costeConIva = coste * ivaFactor; const beneficioBruto = pvp - costeConIva - envio;
     const margenBruto = (beneficioBruto / pvp) * 100; const cpa8 = pvp * 0.08; const cpa11 = pvp * 0.11;
     const tasaConf = tasas.conf / 100; const tasaEntr = tasas.entr / 100; const tasaFinal = tasaConf * tasaEntr;
@@ -165,7 +165,7 @@ export default function App() {
     const costoEnvioEsperado = envio * tasaConf;
     const beneficioEspCOD = ingresoEsperado - costoProductoEsperado - costoEnvioEsperado;
     let comisionRate = 0;
-    if (paisSel === 'colombia' || paisSel === 'mexico' || paisSel === 'argentina') { comisionRate = 0.10; }
+    if (paisSel === 'colombia' || paisSel === 'mexico') { comisionRate = 0.10; }
     else if (paisSel === 'espana') { comisionRate = 0.05; }
     const comisionTesteo = cpa11 * comisionRate; const comisionEscala = cpa8 * comisionRate;
     const comisionObjetivo = cpaObj > 0 ? cpaObj * comisionRate : 0;
@@ -523,7 +523,7 @@ const ProductosView = ({ pais, productos, setProductos, form, setForm, editId, s
                             <div><label className="block text-sm font-bold mb-2 text-gray-300">🏷️ Coste</label><StyledInput type="number" value={form.coste} onChange={(e) => setForm({ ...form, coste: e.target.value })} placeholder="4680" /></div>
                             <div><label className="block text-sm font-bold mb-2 text-gray-300">📮 Envío</label><StyledInput type="number" value={form.envio} onChange={(e) => setForm({ ...form, envio: e.target.value })} placeholder="4680" /></div>
                         </div>
-                        {pais.nombre.toLowerCase() !== 'colombia' && (
+                        {pais.nombre.toLowerCase() !== 'colombia' && pais.nombre.toLowerCase() !== 'argentina' && (
                           <div className="p-4 bg-black/20 border border-white/10 rounded-lg flex justify-between items-center">
                               <div>
                                   <div className="text-sm font-bold text-gray-300">¿Añadir IVA al coste? ({pais.iva}%)</div>
